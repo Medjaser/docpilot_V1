@@ -1,0 +1,97 @@
+# Environnement de développement local DocPilot
+# Démarrage : docker compose up -d   (voir README.md)
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: docpilot-app
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "8000:8000"
+    command: php artisan serve --host=0.0.0.0 --port=8000
+    depends_on:
+      - pgsql
+      - mailpit
+      - minio
+
+  # Exécute les jobs en file d'attente (e-mails, relances, exports ZIP)
+  queue:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: docpilot-queue
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    command: php artisan queue:work --tries=3 --timeout=120
+    depends_on:
+      - pgsql
+
+  # Exécute les tâches planifiées (vérification quotidienne des expirations)
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: docpilot-scheduler
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    command: php artisan schedule:work
+    depends_on:
+      - pgsql
+
+  pgsql:
+    image: postgres:16-alpine
+    container_name: docpilot-pgsql
+    environment:
+      POSTGRES_DB: docpilot
+      POSTGRES_USER: docpilot
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgsql-data:/var/lib/postgresql/data
+      - ./docker/pgsql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  # Boîte mail de test : http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: docpilot-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  # Stockage S3 local (remplace Cloudflare R2 en développement) : console http://localhost:9001
+  minio:
+    image: minio/minio:latest
+    container_name: docpilot-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: docpilot
+      MINIO_ROOT_PASSWORD: docpilot-secret
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+
+  # Crée le bucket privé "docpilot-documents" au premier démarrage
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      mc alias set local http://minio:9000 docpilot docpilot-secret;
+      mc mb --ignore-existing local/docpilot-documents;
+      mc anonymous set none local/docpilot-documents;
+      exit 0;
+      "
+
+volumes:
+  pgsql-data:
+  minio-data:

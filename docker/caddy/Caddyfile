@@ -1,0 +1,19 @@
+# Exemple de configuration production (mois 6, semaine 22).
+# Caddy obtient et renouvelle automatiquement le certificat HTTPS Let's Encrypt.
+app.docpilot.fr {
+    root * /var/www/html/public
+    encode gzip
+    php_fastcgi app:9000
+    file_server
+
+    # Les documents ne sont JAMAIS servis directement : ils passent par des URL temporaires signées.
+    @private path /storage/app/*
+    respond @private 404
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}
