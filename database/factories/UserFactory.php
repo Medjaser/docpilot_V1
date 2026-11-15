@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Enums\UserRole;
+use App\Enums\Role;
 use App\Enums\UserStatus;
 use App\Models\Company;
 use App\Models\User;
@@ -24,15 +24,22 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'role' => UserRole::Admin,
+            'role' => Role::Admin,
             'status' => UserStatus::Active,
+            'is_platform_admin' => false,
             'remember_token' => Str::random(10),
         ];
     }
 
-    public function role(UserRole $role): static
+    public function role(Role $role): static
     {
         return $this->state(fn () => ['role' => $role]);
+    }
+
+    /** Équipe AD CLOUD IT : aucune entreprise. */
+    public function platformAdmin(): static
+    {
+        return $this->state(fn () => ['company_id' => null, 'is_platform_admin' => true]);
     }
 
     public function unverified(): static

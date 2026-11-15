@@ -8,10 +8,10 @@ namespace App\Enums;
 enum SubcontractorStatus: string
 {
     case Draft = 'draft';
-    case AwaitingDocuments = 'awaiting_documents';
+    case WaitingDocuments = 'waiting_documents';
     case Incomplete = 'incomplete';
     case Complete = 'complete';
-    case Expired = 'expired';
+    case ExpiredDocuments = 'expired_documents';
     case Suspended = 'suspended';
     case Archived = 'archived';
 
@@ -19,10 +19,10 @@ enum SubcontractorStatus: string
     {
         return match ($this) {
             self::Draft => 'Brouillon',
-            self::AwaitingDocuments => 'En attente de documents',
+            self::WaitingDocuments => 'En attente de documents',
             self::Incomplete => 'Dossier incomplet',
             self::Complete => 'Dossier complet',
-            self::Expired => 'Documents expirés',
+            self::ExpiredDocuments => 'Documents expirés',
             self::Suspended => 'Suspendu',
             self::Archived => 'Archivé',
         };

@@ -13,8 +13,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->string('email');
-            $table->string('role');
-            $table->string('token_hash', 64)->unique(); // on stocke le hash, jamais le jeton en clair
+            $table->string('role');                     // App\Enums\Role
+            $table->string('token_hash', 64)->unique(); // SHA-256 : le jeton clair n'est jamais stocké
             $table->foreignId('invited_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('expires_at');
             $table->timestamp('accepted_at')->nullable();

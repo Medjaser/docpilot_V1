@@ -2,21 +2,22 @@
 
 namespace App\Models;
 
-use App\Enums\DocumentRequestStatus;
+use App\Enums\RequestStatus;
 use App\Support\Tenancy\BelongsToCompany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 /** Demande de documents envoyée à un sous-traitant, avec son lien de dépôt sécurisé (§9.8). */
 class DocumentRequest extends Model
 {
-    use BelongsToCompany;
+    use BelongsToCompany, HasFactory;
 
     protected $fillable = [
-        'subcontractor_id', 'token_hash', 'status', 'message', 'due_date', 'expires_at',
-        'sent_at', 'last_reminder_at', 'reminder_count', 'auto_reminders', 'cancelled_at', 'created_by',
+        'subcontractor_id', 'token_hash', 'message', 'due_date', 'expires_at', 'status', 'auto_reminders',
+        'sent_at', 'last_reminder_at', 'confirmed_at', 'revoked_at', 'created_by',
     ];
 
     protected $hidden = ['token_hash'];
@@ -24,12 +25,13 @@ class DocumentRequest extends Model
     protected function casts(): array
     {
         return [
-            'status' => DocumentRequestStatus::class,
+            'status' => RequestStatus::class,
             'due_date' => 'date',
             'expires_at' => 'datetime',
             'sent_at' => 'datetime',
             'last_reminder_at' => 'datetime',
-            'cancelled_at' => 'datetime',
+            'confirmed_at' => 'datetime',
+            'revoked_at' => 'datetime',
             'auto_reminders' => 'boolean',
         ];
     }
@@ -54,8 +56,8 @@ class DocumentRequest extends Model
 
     public function isUsable(): bool
     {
-        return $this->status === DocumentRequestStatus::Sent
-            && $this->cancelled_at === null
+        return $this->status === RequestStatus::Sent
+            && $this->revoked_at === null
             && ($this->expires_at === null || $this->expires_at->isFuture());
     }
 
@@ -64,8 +66,13 @@ class DocumentRequest extends Model
         return $this->belongsTo(Subcontractor::class);
     }
 
-    public function documents(): BelongsToMany
+    public function creator(): BelongsTo
     {
-        return $this->belongsToMany(Document::class, 'requested_documents')->withTimestamps();
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function requestedDocuments(): HasMany
+    {
+        return $this->hasMany(RequestedDocument::class);
     }
 }

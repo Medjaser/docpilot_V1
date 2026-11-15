@@ -20,14 +20,14 @@ class SetCurrentCompany
     {
         $user = $request->user();
 
-        if ($user && $user->company_id) {
-            $company = $user->company;
-
-            if (! in_array($company->status, [CompanyStatus::Trial, CompanyStatus::Active], true)) {
-                abort(403, 'Votre espace entreprise est inactif.');
+        if ($user) {
+            if ($user->isPlatformAdmin()) {
+                return redirect()->route('admin.dashboard');
             }
 
-            $this->current->set($company->id);
+            if ($user->company_id) {
+                $this->current->set($user->company_id);
+            }
         }
 
         return $next($request);

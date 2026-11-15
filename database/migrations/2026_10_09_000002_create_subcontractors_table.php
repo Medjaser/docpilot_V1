@@ -14,8 +14,8 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->string('legal_name');
             $table->string('trade_name')->nullable();
-            $table->string('provider_type')->nullable();   // type de prestataire
-            $table->string('activity')->nullable();        // domaine d'activité
+            $table->string('type')->nullable();            // type de prestataire (sous-traitant direct, intérimaire...)
+            $table->string('activity')->nullable();
             $table->string('contact_first_name')->nullable();
             $table->string('contact_last_name')->nullable();
             $table->string('contact_email');
@@ -24,19 +24,20 @@ return new class extends Migration
             $table->string('postal_code', 20)->nullable();
             $table->string('city')->nullable();
             $table->string('country', 2)->default('FR');
-            $table->string('registration_number')->nullable();
+            $table->string('registration_number')->nullable(); // SIRET
             $table->string('status')->default('draft');    // App\Enums\SubcontractorStatus
-            $table->unsignedTinyInteger('completeness_score')->default(0); // dénormalisé pour le tableau de bord
             $table->foreignId('internal_owner_id')->nullable()->constrained('users')->nullOnDelete();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->text('notes')->nullable();             // commentaires internes, jamais visibles du sous-traitant
+            $table->text('notes')->nullable();             // interne, jamais visible du sous-traitant
             $table->jsonb('tags')->nullable();
+            $table->unsignedSmallInteger('completeness_score')->default(0); // 0-100, dénormalisé pour les listes
             $table->timestamp('archived_at')->nullable();
             $table->timestamps();
 
             $table->index(['company_id', 'status']);
             $table->index(['company_id', 'legal_name']);
+            $table->index('internal_owner_id');
         });
     }
 

@@ -16,17 +16,16 @@ class Document extends Model
     use BelongsToCompany, HasFactory;
 
     protected $fillable = [
-        'subcontractor_id', 'document_type_id', 'current_version_id', 'is_required', 'status',
+        'subcontractor_id', 'document_type_id', 'current_version_id', 'status',
         'issue_date', 'expiration_date', 'validated_at', 'validated_by',
-        'rejection_reason', 'rejection_comment', 'internal_comment',
+        'rejection_reason_code', 'rejection_comment', 'archived_at',
     ];
 
     protected function casts(): array
     {
         return [
             'status' => DocumentStatus::class,
-            'rejection_reason' => RejectionReason::class,
-            'is_required' => 'boolean',
+            'rejection_reason_code' => RejectionReason::class,
             'issue_date' => 'date',
             'expiration_date' => 'date',
             'validated_at' => 'datetime',
@@ -57,5 +56,15 @@ class Document extends Model
     public function validator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'validated_by');
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(DocumentComment::class)->latest();
+    }
+
+    public function requestedDocuments(): HasMany
+    {
+        return $this->hasMany(RequestedDocument::class);
     }
 }

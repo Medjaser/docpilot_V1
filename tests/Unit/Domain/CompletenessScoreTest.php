@@ -49,6 +49,6 @@ class CompletenessScoreTest extends TestCase
 
         $this->assertSame(SubcontractorStatus::Complete, $calc->subcontractorStatus([S::Valid, S::Valid]));
         $this->assertSame(SubcontractorStatus::Incomplete, $calc->subcontractorStatus([S::Valid, S::Missing]));
-        $this->assertSame(SubcontractorStatus::Expired, $calc->subcontractorStatus([S::Valid, S::Expired]));
+        $this->assertSame(SubcontractorStatus::ExpiredDocuments, $calc->subcontractorStatus([S::Valid, S::Expired]));
     }
 }

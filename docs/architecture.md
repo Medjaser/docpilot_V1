@@ -56,7 +56,7 @@ Pièges à éviter :
 | users | Utilisateurs | `company_id` NULL = admin plateforme |
 | user_invitations | Invitations de collaborateurs | jeton stocké haché |
 | subcontractors | Fiches sous-traitants | `completeness_score` dénormalisé |
-| document_types | Catégories (Kbis, RC Pro…) | `company_id` NULL = modèle global |
+| document_types | Catégories (Kbis, RC Pro…) | strictement tenant (`company_id` non-null) |
 | document_templates / _items | Modèles de dossiers | ex. « Sous-traitant électricité » |
 | documents | Document attendu = sous-traitant × catégorie | unique (subcontractor, type) |
 | document_versions | Chaque fichier déposé | jamais écrasé ; une version courante |
@@ -68,6 +68,7 @@ Pièges à éviter :
 
 Écarts volontaires par rapport au modèle du cadrage (§13), à valider avec le tuteur :
 
+- Il n'y a plus de catégories globales (`company_id` NULL) : les catégories et modèles par défaut sont strictement isolés par entreprise et copiés dans chaque nouvelle entreprise par `CompanyDefaultsSeeder` lors de son inscription.
 - `requested_documents` pointe vers `documents` (et non `document_types`) : un document attendu existe
   dès l'application du modèle, la demande ne fait que le référencer.
 - La table `notifications` du cadrage est scindée : table Laravel standard (in-app) + `notification_logs`

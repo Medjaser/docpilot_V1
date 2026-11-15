@@ -48,7 +48,8 @@ return [
         ],
 
         's3' => [
-            'driver' => 's3',
+            'driver' => class_exists(\League\Flysystem\AwsS3V3\PortableVisibilityConverter::class) ? 's3' : 'local',
+            'root' => storage_path('app/private/s3'),
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
             'region' => env('AWS_DEFAULT_REGION'),
@@ -60,10 +61,11 @@ return [
             'report' => false,
         ],
 
-        // Disque privé des documents des sous-traitants (MinIO en local, Cloudflare R2 en production).
-        // Aucun fichier n'est public : l'accès passe par Storage::temporaryUrl() après contrôle des droits.
+        // Disque privé des documents des sous-traitants (stockage local privé par défaut si le SDK S3 n'est pas installé).
+        // Aucun fichier n'est public : l'accès passe par DocumentDownloadController après contrôle des droits.
         'documents' => [
-            'driver' => 's3',
+            'driver' => env('DOCUMENTS_DRIVER', class_exists(\League\Flysystem\AwsS3V3\PortableVisibilityConverter::class) ? 's3' : 'local'),
+            'root' => storage_path('app/private/documents'),
             'key' => env('DOCUMENTS_S3_KEY'),
             'secret' => env('DOCUMENTS_S3_SECRET'),
             'region' => env('DOCUMENTS_S3_REGION', 'auto'),

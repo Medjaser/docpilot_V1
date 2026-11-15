@@ -4,21 +4,18 @@ namespace App\Enums;
 
 /**
  * Statut d'un compte utilisateur (§9.4).
+ * Les invitations en attente sont dans user_invitations, pas dans users.
  */
 enum UserStatus: string
 {
-    case Invited = 'invited';
     case Active = 'active';
-    case Disabled = 'disabled';
-    case Archived = 'archived';
+    case Deactivated = 'deactivated';
 
     public function label(): string
     {
         return match ($this) {
-            self::Invited => 'Invité',
             self::Active => 'Actif',
-            self::Disabled => 'Désactivé',
-            self::Archived => 'Archivé',
+            self::Deactivated => 'Désactivé',
         };
     }
 }

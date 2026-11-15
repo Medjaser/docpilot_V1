@@ -41,9 +41,10 @@ Comptes de démonstration (mot de passe `password`) :
 | E-mail | Rôle |
 | --- | --- |
 | admin@docpilot.local | Administrateur plateforme AD CLOUD IT |
-| sophie@batinova.local | Administratrice BatiNova Rénovation |
-| marc@batinova.local | Gestionnaire |
-| julien@batinova.local | Lecteur |
+| sophie@batinova.fr | Administratrice BatiNova Rénovation |
+| marc.dubois@batinova.fr | Gestionnaire BatiNova |
+| julien.moreau@batinova.fr | Lecteur BatiNova |
+| thomas.leroy@concurrent-btp.fr | Administrateur Concurrent BTP (test d'isolation) |
 
 > Les écrans de connexion arrivent au mois 2 (semaine 5) : les comptes existent déjà en base.
 
@@ -87,3 +88,4 @@ tests/Feature/Tenancy/      # tests d'isolation multi-tenant
 - [docs/architecture.md](docs/architecture.md) — architecture, multi-tenant, modèle de données, sécurité
 - [docs/conventions.md](docs/conventions.md) — Git, commits, code, définition de « terminé »
 - [docs/demarrage.md](docs/demarrage.md) — plan des 4 premières semaines et backlog initial
+- [docs/plan-de-travail.md](docs/plan-de-travail.md) — état des lieux et plan semaine par semaine jusqu'à la soutenance

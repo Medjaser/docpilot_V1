@@ -36,7 +36,7 @@ class DocumentStatusResolverTest extends TestCase
             'renouvelé → redevient valide' => [DocumentStatus::Expired, '2027-08-01', DocumentStatus::Valid],
             'sans date d\'expiration → inchangé' => [DocumentStatus::Valid, null, DocumentStatus::Valid],
             'rejeté → inchangé' => [DocumentStatus::Rejected, '2026-07-01', DocumentStatus::Rejected],
-            'en attente → inchangé' => [DocumentStatus::PendingValidation, '2026-07-01', DocumentStatus::PendingValidation],
+            'en attente → inchangé' => [DocumentStatus::Pending, '2026-07-01', DocumentStatus::Pending],
         ];
     }
 }

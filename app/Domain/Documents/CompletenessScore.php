@@ -46,7 +46,7 @@ final class CompletenessScore
     public function subcontractorStatus(array $requiredStatuses): SubcontractorStatus
     {
         if (in_array(DocumentStatus::Expired, $requiredStatuses, true)) {
-            return SubcontractorStatus::Expired;
+            return SubcontractorStatus::ExpiredDocuments;
         }
 
         return $this->calculate($requiredStatuses) === 100

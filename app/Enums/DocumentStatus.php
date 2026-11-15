@@ -10,7 +10,7 @@ enum DocumentStatus: string
     case Missing = 'missing';
     case Requested = 'requested';
     case Uploaded = 'uploaded';
-    case PendingValidation = 'pending_validation';
+    case Pending = 'pending';
     case Valid = 'valid';
     case ExpiringSoon = 'expiring_soon';
     case Expired = 'expired';
@@ -24,7 +24,7 @@ enum DocumentStatus: string
             self::Missing => 'Manquant',
             self::Requested => 'Demandé',
             self::Uploaded => 'Déposé',
-            self::PendingValidation => 'En attente de validation',
+            self::Pending => 'En attente de validation',
             self::Valid => 'Valide',
             self::ExpiringSoon => 'Bientôt expiré',
             self::Expired => 'Expiré',

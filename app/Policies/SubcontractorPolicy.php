@@ -5,41 +5,54 @@ namespace App\Policies;
 use App\Models\Subcontractor;
 use App\Models\User;
 
-/**
- * Seconde barrière d'isolation (après le scope global) + droits par rôle (§8).
- * Modèle à reproduire pour Document, DocumentType, DocumentRequest...
- * Découverte automatique par Laravel (convention App\Policies\{Model}Policy).
- */
 class SubcontractorPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->company_id !== null;
+        return ! $user->isPlatformAdmin()
+            && $user->company_id !== null
+            && $user->hasPermission('subcontractors.view');
     }
 
     public function view(User $user, Subcontractor $subcontractor): bool
     {
-        return $user->belongsToCompany($subcontractor->company_id);
+        return ! $user->isPlatformAdmin()
+            && $user->belongsToCompany($subcontractor->company_id)
+            && $user->hasPermission('subcontractors.view');
     }
 
     public function create(User $user): bool
     {
-        return $user->company_id !== null && $user->role->canManage();
+        return ! $user->isPlatformAdmin()
+            && $user->company_id !== null
+            && $user->hasPermission('subcontractors.create');
     }
 
     public function update(User $user, Subcontractor $subcontractor): bool
     {
-        return $this->view($user, $subcontractor) && $user->role->canManage();
+        return ! $user->isPlatformAdmin()
+            && $user->belongsToCompany($subcontractor->company_id)
+            && $user->hasPermission('subcontractors.edit');
     }
 
     public function archive(User $user, Subcontractor $subcontractor): bool
     {
-        return $this->update($user, $subcontractor);
+        return ! $user->isPlatformAdmin()
+            && $user->belongsToCompany($subcontractor->company_id)
+            && $user->hasPermission('subcontractors.archive');
+    }
+
+    public function remind(User $user, Subcontractor $subcontractor): bool
+    {
+        return ! $user->isPlatformAdmin()
+            && $user->belongsToCompany($subcontractor->company_id)
+            && $user->hasPermission('reminders.send');
     }
 
     public function delete(User $user, Subcontractor $subcontractor): bool
     {
-        // Suppression définitive réservée à l'administrateur de l'entreprise (§9.21)
-        return $this->view($user, $subcontractor) && $user->role->canAdministerCompany();
+        return ! $user->isPlatformAdmin()
+            && $user->belongsToCompany($subcontractor->company_id)
+            && $user->hasPermission('subcontractors.delete');
     }
 }

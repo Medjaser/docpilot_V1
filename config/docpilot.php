@@ -17,6 +17,13 @@ return [
         'allowed_mimes' => ['application/pdf', 'image/jpeg', 'image/png'],
     ],
 
+    'max_upload_mb' => (int) env('DOCPILOT_MAX_UPLOAD_MB', 10),
+
+    'branding' => [
+        // Disque des logos d'entreprise : s3 en production, local en développement sans S3
+        'disk' => env('BRANDING_DISK', 's3'),
+    ],
+
     'documents' => [
         // Un document valide expirant dans moins de N jours passe en "bientôt expiré"
         'expiring_soon_days' => (int) env('DOCPILOT_EXPIRING_SOON_DAYS', 30),
